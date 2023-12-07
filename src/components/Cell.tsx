@@ -23,7 +23,7 @@ export const Cell: React.FC<CellProps> = ({ coordinates }) => {
             case doCoordinatesMatch(coordinates, gameStateAPI.fruitLocation):
                 return String.fromCodePoint(FRUIT_EMOJI_CODE)
             case areCoordinatesInList(coordinates, gameStateAPI.snake):
-                return <div className="SnakeCell"></div>
+                return <div className="SnakeSegment"></div>
             default:
                 return null;
         }
