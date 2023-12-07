@@ -1,0 +1,1 @@
+export const FRUIT_EMOJI_CODE = 127821;
