@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { Direction, GameStateAPI, GameStatus, Snake } from "../types";
-import { areCoordinatesInList, getNextSnakeCoords, getRandomCoordinate, validateSnakeCoords } from "../helpers";
+import { areCoordinatesInList, getEmptyCells, getNextSnakeCoords, getRandomCoordinate, validateSnakeCoords } from "../helpers";
 import * as _ from 'lodash'
 
 interface GameStateConfig {
@@ -18,9 +18,9 @@ const useGameState = (config: GameStateConfig = {
 }): GameStateAPI => {
     if (config.size < 15) throw Error(`Invalid grid size '${config.size}': must be 15 or higher`);
 
-    const [fruitLocation, setFruitLocation] = useState(getRandomCoordinate(config.size));
+    const [snake, setSnake] = useState(config.initialSnakeCoords);
+    const [fruitLocation, setFruitLocation] = useState(getRandomCoordinate(getEmptyCells(config.size, snake)));
     const [direction, setDirection] = useState(config.defaultDirection);
-    const [snake, setSnake] = useState<Snake>(config.initialSnakeCoords)
     const [status, setStatus] = useState(GameStatus.IDLE);
     const [score, setScore] = useState(0);
 
@@ -34,21 +34,26 @@ const useGameState = (config: GameStateConfig = {
         setStatus(GameStatus.IDLE);
         setSnake(config.initialSnakeCoords)
         setDirection(config.defaultDirection);
-        setFruitLocation(getRandomCoordinate(config.size));
+        setFruitLocation(getRandomCoordinate(getEmptyCells(config.size, config.initialSnakeCoords)));
         setScore(0);
-    }, [config])
+    }, [config, snake])
 
     useEffect(() => {
         let interval: number | undefined | void;
+        if (!getEmptyCells(config.size, snake).length) {
+            if (interval) interval = clearInterval(interval);
+            setStatus(GameStatus.WON);
+            return;
+        }
         const startInterval = () => {
             interval = setInterval(() => {
                 const nextSnakeCoords = getNextSnakeCoords(snake, direction, fruitLocation);
-                const isValid = validateSnakeCoords(snake, config.size);
-                const ateFruit = areCoordinatesInList(fruitLocation, nextSnakeCoords);
+                const isValid = validateSnakeCoords(nextSnakeCoords, config.size);
                 if (isValid) {
                     setSnake(nextSnakeCoords);
+                    const ateFruit = areCoordinatesInList(fruitLocation, nextSnakeCoords);
                     if (ateFruit) {
-                        setFruitLocation(getRandomCoordinate(config.size));
+                        setFruitLocation(getRandomCoordinate(getEmptyCells(config.size, snake)));
                         addPoint();
                     }
                 } else {
@@ -93,7 +98,7 @@ const useGameState = (config: GameStateConfig = {
             window.removeEventListener('keyup', handleArrowPress)
             if (interval) interval = clearInterval(interval)
         }
-    }, [status, direction, snake, fruitLocation]);
+    }, [config, status, direction, snake, fruitLocation]);
 
     return useMemo(() => ({
         size: config.size,

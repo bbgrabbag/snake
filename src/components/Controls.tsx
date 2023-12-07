@@ -18,7 +18,14 @@ export const Controls = () => {
             )}
             {gameStateAPI.status === GameStatus.LOST && (
                 <>
-                    <h3>Defeat</h3>
+                    <h3>Defeat!</h3>
+                    <p>Final Score: <span>{gameStateAPI.score}</span></p>
+                    <button onClick={gameStateAPI.resetGame}>Try Again</button>
+                </>
+            )}
+            {gameStateAPI.status === GameStatus.WON && (
+                <>
+                    <h3>Victory!</h3>
                     <p>Final Score: <span>{gameStateAPI.score}</span></p>
                     <button onClick={gameStateAPI.resetGame}>Play Again</button>
                 </>

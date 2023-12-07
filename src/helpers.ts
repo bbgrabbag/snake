@@ -1,7 +1,8 @@
 import { CellCoordinates, Direction, Snake } from "./types"
 
-export const getRandomCoordinate = (gridSize: number): CellCoordinates => {
-    return [null, null].map(() => Math.floor(Math.random() * gridSize)) as CellCoordinates
+export const getRandomCoordinate = (options: CellCoordinates[]): CellCoordinates => {
+    const randomIndex = Math.floor(Math.random() * options.length);
+    return options[randomIndex];
 }
 
 export const doCoordinatesMatch = (coord1: CellCoordinates, coord2: CellCoordinates) => {
@@ -17,6 +18,14 @@ export const isCoordBeyondEdge = (coords: CellCoordinates, size: number): boolea
     return row < 0 || col < 0 || row >= size || col >= size
 }
 
+export const getEmptyCells = (size: number, snake: Snake) => {
+    return Array(Math.pow(size, 2)).fill(null).reduce((output, _, i) => {
+        const coords: CellCoordinates = [Math.floor(i / size), i % size];
+        if (areCoordinatesInList(coords, snake)) return output;
+        return [coords, ...output]
+    }, [])
+}
+
 export const getNextSnakeCoords = (snake: Snake, direction: Direction, fruitLocation: CellCoordinates): Snake => {
     const [[row, col]] = snake;
     const graph: Record<Direction, CellCoordinates> = {
@@ -30,12 +39,7 @@ export const getNextSnakeCoords = (snake: Snake, direction: Direction, fruitLoca
 }
 
 export const validateSnakeCoords = (snake: Snake, size: number): boolean => {
-    // check if snake ate itself
-    // check if head is beyond edge
     if (areCoordinatesInList(snake[0], snake.slice(4))) return false;
     if (isCoordBeyondEdge(snake[0], size)) return false;
-
     return true;
 }
-
-// export const isCoordValid = (coords) => { }
