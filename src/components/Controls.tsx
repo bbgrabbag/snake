@@ -8,7 +8,10 @@ export const Controls = () => {
     return (
         <div className="Controls">
             {gameStateAPI.status === GameStatus.IDLE && (
-                <button onClick={gameStateAPI.startGame}>Start</button>
+                <>
+                    <p>Use keyboard &#8592; &#8594; &#8593; &#x2193; arrows to play</p>
+                    <button onClick={gameStateAPI.startGame}>Start</button>
+                </>
             )}
             {gameStateAPI.status === GameStatus.IN_PROGRESS && (
                 <>
