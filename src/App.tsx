@@ -8,6 +8,7 @@ function App() {
     <div className="App">
       <Grid />
       <Controls />
+      <a href="https://github.com/bbgrabbag/snake">Source Code (GitHub)</a>
     </div>
   )
 }
